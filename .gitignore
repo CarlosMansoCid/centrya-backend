@@ -1,0 +1,4 @@
+node_modules/
+dist/
+user-management-backend/node_modules/
+user-management-backend/dist/
