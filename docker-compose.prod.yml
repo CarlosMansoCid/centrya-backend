@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./user-management-backend
+      dockerfile: Dockerfile # Ensure it uses the same Dockerfile
+    ports:
+      - "3000:3000" # Or your desired production port mapping
+    environment:
+      - PORT=3000
+      - NODE_ENV=production # Set Node environment to production
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_USERNAME=produser      # Use different credentials for production
+      - DB_PASSWORD=prodpassword  # Use different credentials for production
+      - DB_DATABASE=proddb        # Use a different database name for production
+      # - TYPEORM_SYNCHRONIZE=false # Explicitly disable synchronize for production if app relies on this
+                                  # This should ideally be handled by your application's configuration
+                                  # based on NODE_ENV or by not having synchronize: true in source control for production builds.
+                                  # For now, we assume the application or entrypoint script handles this.
+    # No source code volumes for production, image should be self-contained
+    command: npm run start:prod # Command defined in Dockerfile, but can be explicit
+    depends_on:
+      - db
+
+  db:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_USER=produser
+      - POSTGRES_PASSWORD=prodpassword # Ensure these match backend env
+      - POSTGRES_DB=proddb
+    volumes:
+      - prod_pgdata:/var/lib/postgresql/data # Use a separate named volume for production data
+    # For production, you might remove the ports mapping for the database
+    # if it doesn't need to be accessed directly from outside the Docker network.
+    # ports:
+    #   - "5433:5432" # Example if you need external access on a different port
+
+volumes:
+  prod_pgdata: # Define a separate named volume for production PostgreSQL data
