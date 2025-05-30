@@ -149,4 +149,93 @@ export class UsersService {
         throw new NotFoundException(`User with ID #${id} not found for deletion`);
     }
   }
+
+  // --- New methods below ---
+
+  async findByEmail(email: string): Promise<User | null> {
+    if (!email) return null; // Or throw BadRequestException
+    const user = await this.userRepository.findOne({
+      where: { contact: { email } },
+      relations: ['security', 'contact', 'security.roles', 'security.permissions'],
+    });
+    return user; // Can be null if not found, handled by caller
+  }
+
+  async setEmailVerified(email: string): Promise<UserContact> {
+    if (!email) {
+      throw new BadRequestException('Email must be provided.');
+    }
+    const contact = await this.userContactRepository.findOneBy({ email });
+    if (!contact) {
+      throw new NotFoundException(`UserContact with email ${email} not found.`);
+    }
+    contact.isEmailVerified = true;
+    contact.emailVerificationToken = null;
+    return this.userContactRepository.save(contact);
+  }
+
+  async storeEmailChangeToken(userId: number, newEmail: string, token: string): Promise<UserContact> {
+    const user = await this.userRepository.findOne({ where: { id: userId }, relations: ['contact'] });
+    if (!user || !user.contact) {
+      throw new NotFoundException(`User or user contact not found for UserID #${userId}.`);
+    }
+    const contact = user.contact;
+    contact.newEmail = newEmail;
+    contact.emailChangeToken = token;
+    return this.userContactRepository.save(contact);
+  }
+
+  async clearEmailChangeRequest(contactId: number): Promise<UserContact> {
+    const contact = await this.userContactRepository.findOneBy({ id: contactId });
+    if (!contact) {
+      throw new NotFoundException(`UserContact with ID #${contactId} not found.`);
+    }
+    contact.newEmail = null;
+    contact.emailChangeToken = null;
+    return this.userContactRepository.save(contact);
+  }
+
+  async updateUserEmail(contactId: number, newEmail: string): Promise<UserContact> {
+    const contact = await this.userContactRepository.findOneBy({ id: contactId });
+    if (!contact) {
+      throw new NotFoundException(`UserContact with ID #${contactId} not found.`);
+    }
+    contact.email = newEmail;
+    contact.isEmailVerified = true; // Assuming token verification implies new email is verified
+    contact.newEmail = null;
+    contact.emailChangeToken = null;
+    return this.userContactRepository.save(contact);
+  }
+
+  async updatePassword(userId: number, newPasswordHash: string): Promise<UserSecurity> {
+    const user = await this.userRepository.findOne({ where: { id: userId }, relations: ['security'] });
+    if (!user || !user.security) {
+      throw new NotFoundException(`User or user security profile not found for UserID #${userId}.`);
+    }
+    const securityProfile = user.security;
+    securityProfile.passwordHash = newPasswordHash;
+    // Potentially add logic for passwordLastChangedAt, etc.
+    return this.userSecurityRepository.save(securityProfile);
+  }
+
+  async storeEmailVerificationToken(userId: number, token: string): Promise<UserContact> {
+    const user = await this.userRepository.findOne({ where: { id: userId }, relations: ['contact'] });
+    if (!user || !user.contact) {
+      throw new NotFoundException(`User or user contact not found for UserID #${userId}.`);
+    }
+    const contact = user.contact;
+    contact.emailVerificationToken = token;
+    contact.isEmailVerified = false; // Explicitly set to false until verified
+    return this.userContactRepository.save(contact);
+  }
+
+  async findByEmailChangeToken(token: string): Promise<UserContact | null> {
+    if (!token) return null;
+    return this.userContactRepository.findOne({ where: { emailChangeToken: token } });
+  }
+
+  async findByEmailVerificationToken(token: string): Promise<UserContact | null> {
+    if (!token) return null;
+    return this.userContactRepository.findOne({ where: { emailVerificationToken: token } });
+  }
 }
