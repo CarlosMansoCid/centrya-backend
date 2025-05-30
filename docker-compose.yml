@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./user-management-backend
+      dockerfile: Dockerfile # Explicitly specify Dockerfile, good practice
+    ports:
+      - "3000:3000" # Map host port 3000 to container port 3000 (or your app's configured port)
+    environment:
+      - PORT=3000
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_USERNAME=devuser
+      - DB_PASSWORD=devpassword
+      - DB_DATABASE=devdb
+      # Add any other environment variables your application needs for development
+      # For example, if TypeORM synchronize is controlled by an env var:
+      # - TYPEORM_SYNCHRONIZE=true 
+    volumes:
+      - ./user-management-backend:/usr/src/app # Mount host src directory to container src directory
+      - /usr/src/app/node_modules # Exclude node_modules from being overwritten by the host mount
+      - /usr/src/app/dist # Exclude dist from being overwritten by the host mount
+    command: npm run start:dev # Use the development start script for hot reloading
+    depends_on:
+      - db # Ensure db starts before backend
+
+  db:
+    image: postgres:15-alpine # Use a specific version of PostgreSQL
+    environment:
+      - POSTGRES_USER=devuser
+      - POSTGRES_PASSWORD=devpassword
+      - POSTGRES_DB=devdb
+    ports:
+      - "5432:5432" # Map host port 5432 to container port 5432 for direct DB access if needed
+    volumes:
+      - pgdata:/var/lib/postgresql/data # Persist database data
+
+volumes:
+  pgdata: # Define a named volume for persistent PostgreSQL data
