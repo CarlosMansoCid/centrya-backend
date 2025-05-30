@@ -39,7 +39,7 @@ export class AuthController {
   @UseGuards(JwtAuthGuard) // Apply guard
   @Post('change-password')
   @HttpCode(HttpStatus.OK)
-  async changePassword(@Request() req, @Body() changePasswordDto: ChangePasswordDto) {
+  async changePassword(@Request() req: any, @Body() changePasswordDto: ChangePasswordDto) {
     // req.user should be populated by JwtAuthGuard with { userId: number, email: string }
     const userId = req.user.userId; 
     return this.authService.changePassword(userId, changePasswordDto);
@@ -48,7 +48,7 @@ export class AuthController {
   @UseGuards(JwtAuthGuard) // Apply guard
   @Post('request-email-change')
   @HttpCode(HttpStatus.OK)
-  async requestEmailChange(@Request() req, @Body() requestEmailChangeDto: RequestEmailChangeDto) {
+  async requestEmailChange(@Request() req: any, @Body() requestEmailChangeDto: RequestEmailChangeDto) {
     const userId = req.user.userId;
     return this.authService.requestEmailChange(userId, requestEmailChangeDto);
   }

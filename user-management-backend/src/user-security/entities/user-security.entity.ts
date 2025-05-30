@@ -13,11 +13,11 @@ export class UserSecurity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'varchar', length: 255 })
-  passwordHash: string;
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  passwordHash?: string;
 
-  @Column({ type: 'boolean', default: true })
-  active: boolean;
+  @Column({ type: 'boolean', default: true, nullable: true })
+  active?: boolean;
 
   @ManyToMany(() => Role, { eager: false })
   @JoinTable({

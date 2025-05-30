@@ -127,9 +127,15 @@ export class AuthService {
 
     try {
       const userName = await this.getUserName(user);
-      await this.emailService.sendPasswordChangeNotificationEmail(user.contact.email, userName);
+      if (user.contact && user.contact.email) { // Added check here
+        await this.emailService.sendPasswordChangeNotificationEmail(user.contact.email, userName);
+      } else {
+        console.error(`User contact email not found for user ID: ${userId}. Cannot send password change notification.`);
+      }
     } catch (emailError) {
-      console.error(`Failed to send password change notification to ${user.contact.email}:`, emailError);
+      // Updated logging to be more specific if email was attempted
+      const emailForLog = user.contact && user.contact.email ? user.contact.email : `ID ${userId} (email not found)`;
+      console.error(`Failed to send password change notification to ${emailForLog}:`, emailError);
       // Log and continue
     }
     return { message: 'Password successfully changed.' };
@@ -203,7 +209,7 @@ export class AuthService {
     let userNameForNotification = 'User'; 
     // Attempt to get user details if possible to provide a name.
     // This is a simplified approach; a more robust solution might involve ensuring user context.
-    const userOwningContact = await this.usersService.userRepository.findOne({where: {contact: {id: userContact.id}}});
+    const userOwningContact = await this.usersService.findByContactId(userContact.id);
     if (userOwningContact) {
         userNameForNotification = await this.getUserName(userOwningContact);
     }

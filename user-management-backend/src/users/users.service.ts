@@ -238,4 +238,15 @@ export class UsersService {
     if (!token) return null;
     return this.userContactRepository.findOne({ where: { emailVerificationToken: token } });
   }
+
+  public async findByContactId(contactId: number): Promise<User | null> {
+    return this.userRepository.findOne({
+      where: { contact: { id: contactId } },
+      // Add relations if needed, e.g., relations: ['security', 'contact']
+      // depending on what the AuthService needs from this user object.
+      // For the current use case in AuthService.confirmEmailChange, 'name' is used.
+      // 'name' is a direct property of User, so no extra relations might be needed unless
+      // getUserName method relies on other relations.
+    });
+  }
 }
