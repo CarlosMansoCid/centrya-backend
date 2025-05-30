@@ -14,6 +14,8 @@ services:
       - DB_USERNAME=devuser
       - DB_PASSWORD=devpassword
       - DB_DATABASE=devdb
+      - JWT_SECRET=your_development_jwt_secret # Added
+      - FRONTEND_URL=http://localhost:3001 # Added (example URL)
       # Add any other environment variables your application needs for development
       # For example, if TypeORM synchronize is controlled by an env var:
       # - TYPEORM_SYNCHRONIZE=true 

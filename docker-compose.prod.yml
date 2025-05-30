@@ -15,6 +15,8 @@ services:
       - DB_USERNAME=produser      # Use different credentials for production
       - DB_PASSWORD=prodpassword  # Use different credentials for production
       - DB_DATABASE=proddb        # Use a different database name for production
+      - JWT_SECRET=your_strong_production_jwt_secret # Added (use a strong, unique secret)
+      - FRONTEND_URL=https://yourproductiondomain.com # Added (example URL)
       # - TYPEORM_SYNCHRONIZE=false # Explicitly disable synchronize for production if app relies on this
                                   # This should ideally be handled by your application's configuration
                                   # based on NODE_ENV or by not having synchronize: true in source control for production builds.
