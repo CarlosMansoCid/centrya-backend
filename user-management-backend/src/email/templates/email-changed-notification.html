@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Address Updated</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; color: #333; }
+        .container { max-width: 600px; margin: auto; background: #f9f9f9; padding: 20px; border-radius: 8px; }
+        .header { font-size: 24px; color: #444; margin-bottom: 20px; }
+        p { line-height: 1.6; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="header">Hi {{name}},</h1>
+        <p>This email confirms that the email address associated with your account has been successfully updated.</p>
+        <p>Your old email address was: <strong>{{oldEmail}}</strong></p>
+        <p>Your new email address is now: <strong>{{newEmail}}</strong></p>
+        <p>If you did not make this change, please contact our support team immediately.</p>
+        <p>Thanks,<br>The Team</p>
+    </div>
+</body>
+</html>

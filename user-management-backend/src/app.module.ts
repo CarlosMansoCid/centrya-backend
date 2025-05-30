@@ -8,6 +8,8 @@ import { PermissionsModule } from './permissions/permissions.module';
 import { UserContactModule } from './user-contact/user-contact.module';
 import { UserSecurityModule } from './user-security/user-security.module';
 import { UsersModule } from './users/users.module';
+import { AuthModule } from './auth/auth.module';
+import { EmailModule } from './email/email.module';
 
 @Module({
   imports: [
@@ -33,6 +35,8 @@ import { UsersModule } from './users/users.module';
     UserContactModule,
     UserSecurityModule,
     UsersModule,
+    AuthModule,
+    EmailModule,
   ],
   controllers: [AppController],
   providers: [AppService],
